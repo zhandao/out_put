@@ -18,7 +18,7 @@ And then execute:
 
 ## Usage
 
-### Config
+### Config (it's optional)
 
 initializers: `out_put.rb`
 
@@ -29,9 +29,11 @@ OutPut::Config.tap do |config|
 end
 ```
 
+`project_code` (defaults to 0) + `code` will be the final code
+
 ### Basic
 
-if your controller does **not** inherit from `ActionController::API`:
+Add this line in your (base) controller:
 
 ```ruby
 include OutPut
