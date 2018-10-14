@@ -4,7 +4,7 @@ require 'out_put/config'
 module OutPut
   def output(code = 0, msg = '', only: nil, http: 200, **data)
     if !code.is_a?(Integer) && code.respond_to?(:info)
-      code, msg, only, http = code.info.slice(:code, :msg, :only, :http).values
+      code, msg, http, only = code.info.slice(:code, :msg, :http, :only).values
     end
 
     return render json: only, status: http if only.present?
