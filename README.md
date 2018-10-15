@@ -18,7 +18,7 @@ And then execute:
 
 ## Usage
 
-### Config (it's optional)
+### 1. Config (it's optional)
 
 initializers: `out_put.rb`
 
@@ -31,7 +31,7 @@ end
 
 `project_code` (defaults to 0) + `code` will be the final code
 
-### Basic
+### 2. Basic
 
 Add this line in your (base) controller:
 
@@ -53,7 +53,7 @@ output code: 0, msg: 'success'
 ok # => code: 0, message: 'success'
 ```
 
-### Response `data` filed
+### 3. Response `data` filed
 
 ```ruby
 output 0, foo: 'bar', list: [ 1, 2, 3 ]
@@ -67,13 +67,13 @@ output 0, foo: 'bar', list: [ 1, 2, 3 ]
 ok_with foo: 'bar'
 ```
 
-### Set HTTP status
+### 4. Set HTTP status
 
 ```ruby
 output 0, 'success', http: 200
 ```
 
-### Error Response
+### 5. Error Response
 
 You don't need to pass your project code like '101', after **config**:
 
@@ -85,7 +85,7 @@ error_with 700, 'msg', foo: 'bar'
 
 `error` is an alias of `output`
 
-### `output` any objects which have implemented serialization method `info`
+### 6. `output` any objects which have implemented serialization method `info`
 
 ```ruby
 BusinessError.record_not_found.info # => { code: ..., msg: ... }
@@ -95,7 +95,7 @@ output BusinessError.record_not_found
 
 [About `business_error`](https://github.com/zhandao/business_error/)
 
-### Just render the given data without default format
+### 7. Just render the given data without default format
 
 ```ruby
 output only: { foo: 'bar' }
@@ -105,9 +105,9 @@ output only: { foo: 'bar' }
 output only: [ 1, 2, 3 ]
 ```
 
-### Other
+### 8. Other
 
-#### 1. automatically set `total`:
+#### 8.a automatically set `total`:
 
 if `config.pagination_for = :list`:
 
@@ -118,4 +118,13 @@ output 0, list: [ 1, 2, 3 ]
 #   result: { code: 0, message: '' }
 #     data: { total: 3, list: [1,2,3] }
 # }
+```
+
+#### 8.b use `build_with` to pass an variable `@view` to your view
+
+```ruby
+build_with data: 'hello'
+
+# the in your .jbuilder
+json.data @view[:data]
 ```

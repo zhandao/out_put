@@ -13,7 +13,7 @@ module OutPut
     msg = 'success' if msg.blank? && code.zero?
     render json: {
         result: { code: code, message: msg },
-        data: output_data(data)
+        data: _output_data(data)
     }, status: http
   end
 
@@ -22,11 +22,17 @@ module OutPut
   alias error      output
   alias error_with output
 
-  def output_data(data)
+  def _output_data(data)
     if data.key?(Config.pagination_for)
-      data.merge!(total: data[Config.pagination_for].size)
+      # TODO now is noly for AR
+      data.merge!(total: data[Config.pagination_for].try(:unscoped).count)
     end
 
     data
+  end
+
+  def build_with(**data)
+    @view = data
+    # Then jump to your view
   end
 end
