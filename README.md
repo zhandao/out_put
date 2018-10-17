@@ -123,8 +123,17 @@ output 0, list: [ 1, 2, 3 ]
 #### 8.b use `build_with` to pass an variable `@view` to your view
 
 ```ruby
-build_with data: 'hello'
+build_with key: 'val'
+build_with code=0, msg='success', key: 'val'
 
 # the in your .jbuilder
-json.data @view[:data]
+json.result do
+  json.code @view[:code] || 0
+  json.msg  @view[:msg]  || 'success'
+end
+json.data do
+  json.merge! @view.data # => expect code and msg, for example { key: 'val' }
+  # or
+  json.key @view[:key]
+end
 ```

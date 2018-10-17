@@ -1,5 +1,6 @@
 require 'out_put/version'
 require 'out_put/config'
+require 'out_put/view'
 
 module OutPut
   def output(code = 0, msg = '', only: nil, http: 200, **data)
@@ -24,15 +25,15 @@ module OutPut
 
   def _output_data(data)
     if data.key?(Config.pagination_for)
-      # TODO now is noly for AR
+      # TODO now is only for AR
       data.merge!(total: data[Config.pagination_for].try(:unscoped).count)
     end
 
     data
   end
 
-  def build_with(**data)
-    @view = data
+  def build_with(code = 0, msg = 'success', **data)
+    @view = View.new(code, msg, **data)
     # Then jump to your view
   end
 end
