@@ -105,9 +105,27 @@ output only: { foo: 'bar' }
 output only: [ 1, 2, 3 ]
 ```
 
-### 8. Other
+### 8. cache
 
-#### 8.a automatically set `total`:
+```ruby
+output cache: 24.hours do
+  { list: User.all }
+end # will render: { list: [...] }
+
+output foo: 'bar', cache: 24.hours do
+  { list: User.all }
+end # will render: { foo: 'bar', list: [...] }
+
+output only: { foo: 'bar' }, cache: 24.hours do
+  { only: { list: User.all } }
+end # will ONLY render: { foo: 'bar', list: [...] }
+```
+
+Note: the cache key will be `"output/#{action_name}"`
+
+### X. Other
+
+#### X.a automatically set `total`:
 
 if `config.pagination_for = :list`:
 
@@ -120,7 +138,7 @@ output 0, list: [ 1, 2, 3 ]
 # }
 ```
 
-#### 8.b use `build_with` to pass an variable `@view` to your view
+#### X.b use `build_with` to pass an variable `@view` to your view
 
 ```ruby
 build_with key: 'val'
