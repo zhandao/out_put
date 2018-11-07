@@ -5,7 +5,8 @@ require 'out_put/view'
 module OutPut
   def output(code = 0, msg = '', only: nil, http: 200, cache: nil, **data, &block)
     if !code.is_a?(Integer) && code.respond_to?(:info)
-      code, msg, http, only = code.info.slice(:code, :msg, :http, :only).values
+      only = code.info[:only]
+      code, msg, http = code.info.slice(:code, :msg, :http).values
     elsif cache && block_given?
       data, only = _output_cache(cache, data: data, only: only, &block)
     end
@@ -44,6 +45,6 @@ module OutPut
       instance_eval(&block)
     end
 
-    [ data.merge(cached), only&.merge(cached[:only]) ]
+    [ data.merge(cached), cached&.[](:only)&.merge(only || { }) ]
   end
 end
