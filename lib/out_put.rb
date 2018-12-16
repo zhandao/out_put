@@ -11,7 +11,7 @@ module OutPut
       data, only = _output_cache(cache, data: data, only: only, &block)
     end
 
-    return render json: only, status: http if only.present?
+    return render json: only.except(:http), status: only[:http] || http if only.present?
 
     code = code.zero? ? 0 : Config.project_code + code
     msg = 'success' if msg.blank? && code.zero?
@@ -27,7 +27,7 @@ module OutPut
   alias error_with output
 
   def build_with(code = 0, msg = 'success', **data)
-    @view = View.new(code, msg, **data)
+    (@view ||= View.new(code, msg)).merge!(data)
     # Then jump to your view
   end
 
