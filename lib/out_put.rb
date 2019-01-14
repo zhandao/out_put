@@ -5,8 +5,7 @@ require 'out_put/view'
 module OutPut
   def output(code = 0, msg = '', only: nil, http: 200, cache: nil, **data, &block)
     if !code.is_a?(Integer) && code.respond_to?(:info)
-      only = code.info[:only]
-      code, msg, http = code.info.slice(:code, :msg, :http).values
+      code, msg, http, only, data = code.info.values_at(:code, :msg, :http, :only, :data)
     elsif cache && block_given?
       data, only = _output_cache(cache, data: data, only: only, &block)
     end
@@ -32,7 +31,7 @@ module OutPut
   end
 
   def _output_data(data)
-    if data.key?(Config.pagination_for)
+    if data&.key?(Config.pagination_for)
       # TODO now is only for AR
       data.merge!(total: data[Config.pagination_for].try(:unscoped).count)
     end
