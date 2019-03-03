@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module OutPut
   class View < Hash
     def initialize(code, msg)

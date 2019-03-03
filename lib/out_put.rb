@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'out_put/version'
 require 'out_put/config'
 require 'out_put/view'
@@ -5,19 +7,14 @@ require 'out_put/view'
 module OutPut
   def output(code = 0, msg = '', only: nil, http: 200, cache: nil, **data, &block)
     if !code.is_a?(Integer) && code.respond_to?(:info)
-      code, msg, http, only, data = code.info.values_at(:code, :msg, :http, :only, :data)
+      only = code.info[:only]
+      code, msg, http, data = code.info.values_at(:code, :msg, :http, :data)
     elsif cache && block_given?
       data, only = _output_cache(cache, data: data, only: only, &block)
     end
 
-    return render json: only.except(:http), status: only[:http] || http if only.present?
-
-    code = code.zero? ? 0 : Config.project_code + code
-    msg = 'success' if msg.blank? && code.zero?
-    render json: {
-        result: { code: code, message: msg },
-        data: _output_data(data)
-    }, status: http
+    return rendrer json: only.except(:http), status: only[:http] || http if only.present?
+    render json: { result: _output_result(code, msg), data: _output_data(data) }, status: http
   end
 
   alias ok         output
@@ -30,13 +27,22 @@ module OutPut
     # Then jump to your view
   end
 
+  # ***
+
+  def _output_result(code, msg)
+    # code = code.zero? ? 0 : Config.project_code + code
+    msg = 'success' if msg.blank? && code.zero?
+    msg = "[#{instance_exec(&Config.request_id)}] #{msg}" if Config.request_id && !code.zero?
+    { code: code, message: msg }
+  end
+
   def _output_data(data)
     if data&.key?(Config.pagination_for)
       # TODO now is only for AR
       data.merge!(total: data[Config.pagination_for].try(:unscoped).count)
     end
 
-    data
+    data || { }
   end
 
   def _output_cache(time, data: { }, only: nil, &block)
