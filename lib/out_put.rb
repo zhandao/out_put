@@ -5,7 +5,8 @@ require 'out_put/config'
 require 'out_put/view'
 
 module OutPut
-  def output(code = 0, msg = '', only: nil, http: 200, cache: nil, **data, &block)
+  def output(code = 0, msg = '', only: nil, http: 200, cache: nil, data: nil, **d, &block)
+    data ||= d || { }
     if !code.is_a?(Integer) && code.respond_to?(:info)
       only = code.info[:only]
       code, msg, http, data = code.info.values_at(:code, :msg, :http, :data)
@@ -13,8 +14,8 @@ module OutPut
       data, only = _output_cache(cache, data: data, only: only, &block)
     end
 
-    return rendrer json: only.except(:http), status: only[:http] || http if only.present?
-    render json: { result: _output_result(code, msg), data: _output_data(data) }, status: http
+    return render json: only.except(:http), status: only[:http] || http if only.present?
+    render json: { result: _output_result(code, msg), data: data }, status: http
   end
 
   alias ok         output
@@ -34,15 +35,6 @@ module OutPut
     msg = 'success' if msg.blank? && code.zero?
     msg = "[#{instance_exec(&Config.request_id)}] #{msg}" if Config.request_id && !code.zero?
     { code: code, message: msg }
-  end
-
-  def _output_data(data)
-    if data&.key?(Config.pagination_for)
-      # TODO now is only for AR
-      data.merge!(total: data[Config.pagination_for].try(:unscoped).count)
-    end
-
-    data || { }
   end
 
   def _output_cache(time, data: { }, only: nil, &block)
